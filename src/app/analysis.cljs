@@ -3,10 +3,12 @@
 
 (defn get-stat [group]
   (let [cnt (count group)
-        sum (apply + (map :v group))
+        sum (apply + (map :ms group))
         mean (/ sum cnt)
-        variance (apply + (map (fn [{v :v}] (Math/pow (- v mean) 2))
-                               group))
+        variance (as-> group $
+                   (map (fn [{v :ms}] (Math/pow (- v mean) 2)) $)
+                   (apply + $)
+                   (/ $ cnt))
         std (Math/sqrt variance)
         cv (/ std mean)]
     {:cnt cnt, :mean (/ sum cnt), :cv cv}))
@@ -30,4 +32,10 @@
   (join {"a" {:mean 1} "b" {:mean 2}} {"a" {:mean 10} "c" {:mean 20}})
   (pass? {:old {:mean 2}, :new {:mean 1.2}})
   (pass? {:old {:mean 2}})
-  (pass? {:old {:mean 2}, :new {:mean 3.2}}))
+  (pass? {:old {:mean 2}, :new {:mean 3.2}})
+  data/new
+  (aggregate data/new :bench_simple)
+
+  (join
+   (aggregate data/new :bench_simple)
+   (aggregate data/old :bench_simple)))
