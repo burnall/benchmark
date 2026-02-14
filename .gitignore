@@ -1,0 +1,10 @@
+.calva/
+.clj-kondo/
+.cpcache/
+.lsp/
+db.transit.json
+.shadow-cljs/
+node_modules/
+out/
+.tool-versions
+package-lock.json
