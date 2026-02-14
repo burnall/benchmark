@@ -1,0 +1,9 @@
+{:deps true
+ :dev-http {8080 "public"}
+ :builds
+ {:app {:target :browser
+        :modules {:main {:entries [app.core]
+                         :init-fn app.core/start}}
+        :output-dir "public/js"
+        :asset-path "/js"
+        :devtools {:preloads [uix.preload]}}}}
