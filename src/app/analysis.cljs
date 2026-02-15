@@ -40,12 +40,6 @@
              {}
              joined-agg))
 
-;; (defn filter-by-options [joined-agg options]
-;;   (let [x (filter-by-options2 joined-agg options)
-;;         y (js/console.log (clj->js x))] x))
-;; (defn filter-by-options [joined-agg options]
-;;   joined-agg)
-
 (defn- filter-by-benchmark [sample short? benchmark]
   (let [key (if short? :bench_simple :bench_full)]
     (filter #(= benchmark (key %)) sample)))

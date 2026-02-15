@@ -4,14 +4,15 @@
             [app.ui.cockpit :refer [cockpit]]
             [app.ui.chart :refer [pie-chart]]
             [app.ui.grid :refer [grid]]
+            [app.ui.details-grid :refer [details-grid]]
             [uix.core :as uix :refer [defui $]]
             [uix.dom]))
 
 (declare start)
 (defn ^:export init [] (start))
 
-(def cockpit-default-options {:regression 5.0,
-                              :coeff-variation 40.0,
+(def cockpit-default-options {:regression 1.0,
+                              :coeff-variation 150.0, ; Lots of high CV data
                               :group-simple? true
                               :ignore-missing? true})
 
@@ -29,7 +30,6 @@
       (update :coeff-variation #(/ % 100))))
 
 (defn get-benchmarks [options]
-  ;; (prn (js->clj options))
   (let [key (if (:group-simple? options) :simple :full)
         benchmarks (key benchmarks-joined-agg)]
     (an/filter-by-options benchmarks (normalise-options options))))
@@ -43,24 +43,26 @@
         benchmarks (get-benchmarks options)
         failed-count (count benchmarks)
         total-count (get-benchmark-count options)
-        aa (js/console.log "counts" failed-count total-count)]
+        [selected-benchmark set-selected-benchmark!] (uix.core/use-state nil)
+        samples (an/filter-samples-by-benchmark data/old data/new (:group-simple? options) selected-benchmark)]
     ($ :div {:class "app"}
        ($ :div {:class "top-row"}
           ($ cockpit {:options options, :on-apply set-options!})
           ($ :div {:class "panel panel-right"}
              ($ pie-chart {:total total-count :failed failed-count})))
        ($ :div {:class "panel panel-bottom"}
-          ($ grid benchmarks))
-       ($ :div {:class "panel panel-bottom"}))))
+          ($ grid {:benchmarks benchmarks :on-select-benchmark set-selected-benchmark!}))
+       ($ :div {:class "panel panel-bottom"}
+          ($ details-grid samples)))))
 
 (defonce root (uix.dom/create-root (js/document.getElementById "root")))
 
 (defn ^:export start []
   (uix.dom/render-root ($ app) root))
 
-
 (comment
   (an/join
-   (an/aggregate data/new :bench_simple)
-   (an/aggregate data/old :bench_simple))
-  (normalise-options cockpit-default-options))
+   (an/aggregate data/old :bench_simple)
+   (an/aggregate data/new :bench_simple))
+  (normalise-options cockpit-default-options)
+  (filter (fn [[k]] (= k "NodeHashJoin.executePlan"))  (:simple benchmarks-joined-agg)))

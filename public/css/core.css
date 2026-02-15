@@ -83,7 +83,7 @@ body {
 
 .input {
     flex: 1;    
-    width: 5ch;
+    /* width: 5ch; */
 }
 
 .panel-footer {
@@ -100,22 +100,31 @@ body {
 
 /* Grid */
 .simple-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 4px;
 }
 
 .grid-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    display: contents;
     grid-auto-flow: column;
     gap: 4px;
     cursor: pointer;
 }
 
-.grid-row> :first-child {
-    min-width: 0;
+.benchmark-grid {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
 }
+
+.detail-grid {
+    grid-template-columns: auto auto auto auto;
+}
+
+.grid-row> :first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .grid-row:hover {
     background: #f5f5f5;
 }
@@ -127,6 +136,7 @@ body {
 
 .grid-cell {
     padding: 2px 6px;
+    min-width: 0;
 }
 
 /*Input with no spinner*/
