@@ -53,6 +53,7 @@
        ($ :div {:class "panel panel-bottom"}
           ($ grid {:benchmarks benchmarks :on-select-benchmark set-selected-benchmark!}))
        ($ :div {:class "panel panel-bottom"}
+          ($ :div selected-benchmark)
           ($ details-grid samples)))))
 
 (defonce root (uix.dom/create-root (js/document.getElementById "root")))
