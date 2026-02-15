@@ -1,7 +1,6 @@
-(ns app.analysis
-  (:require [app.data :as data]))
+(ns app.analysis)
 
-(defn get-stat [group]
+(defn- get-stat [group]
   (let [cnt (count group)
         sum (apply + (map :ms group))
         mean (/ sum cnt)
@@ -22,20 +21,22 @@
         new (update-vals new-agg (fn [val] {:new val}))]
     (merge-with merge old new)))
 
-(defn pass? [{:keys [old new]}]
-  (cond
-    (and old new) (>= (:mean old) (:mean new))
-    :else true))
+(defn- regression-passed? [old-v new-v regression]
+  (>= regression (/ (- new-v old-v) old-v)))
+
+(defn pass? [{:keys [old new]} {:keys [regression coeff-variation ignore-missing-new]}]
+  (if new
+    (and (<= (:cv new) coeff-variation)
+         (regression-passed? (:mean old) (:mean new) regression))
+    ignore-missing-new))
 
 (comment
-  (aggregate [{:a "a" :v 1}, {:a "a" :v 3}, {:a "b" :v 10}] :a)
+  (aggregate [{:a "a" :ms 1}, {:a "a" :ms 3}, {:a "b" :ms 10}] :a)
   (join {"a" {:mean 1} "b" {:mean 2}} {"a" {:mean 10} "c" {:mean 20}})
-  (pass? {:old {:mean 2}, :new {:mean 1.2}})
-  (pass? {:old {:mean 2}})
-  (pass? {:old {:mean 2}, :new {:mean 3.2}})
-  data/new
-  (aggregate data/new :bench_simple)
-
-  (join
-   (aggregate data/new :bench_simple)
-   (aggregate data/old :bench_simple)))
+  (pass? {:old {:mean 2}, :new {:mean 1.5}} {:regression 0, :coeff-variation 1, :ignore-missing-new true})
+  (pass? {:old {:mean 2}, :new {:mean 2.5}} {:regression 0.3, :coeff-variation 1, :ignore-missing-new true})
+  (pass? {:old {:mean 2}, :new {:mean 2.5}} {:regression 0.2, :coeff-variation 1, :ignore-missing-new true})
+  (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.05, :ignore-missing-new true})
+  (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.1, :ignore-missing-new true})
+  (pass? {:old {:mean 2}} {:ignore-missing-new true})
+  (pass? {:old {:mean 2}} {:ignore-missing-new false}))

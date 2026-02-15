@@ -2,6 +2,7 @@
 .clj-kondo/
 .cpcache/
 .lsp/
+.nrepl-port
 db.transit.json
 .shadow-cljs/
 node_modules/
