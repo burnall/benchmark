@@ -3,60 +3,58 @@
             [uix.dom]))
 
 ; [regression coeff-variation group-simple? ignore-missing?]
-(defui cockpit [options]
-  (let [[state set-state!] (uix.core/use-state options)]
-
+(defui cockpit [{:keys [options on-apply]}]
+  (let [[options set-options!] (uix.core/use-state options)]
     (letfn [(update! [k v]
-              (set-state! #(assoc % k v)))]
-
+              (set-options! #(assoc % k v)))]
       ($ :div {:class "panel cockpit"}
 
-         ;; header
+         ;; Header
          ($ :div {:class "panel-header"}
             ($ :h2 "Cockpit"))
 
-         ;; group by
+         ;; Group by
          ($ :div {:class "panel-row"}
             ($ :label {:class "field"}
                ($ :input {:type "checkbox"
-                          :checked (:group-simple? state)
+                          :checked (:group-simple? options)
                           :on-change #(update! :group-simple?
                                                (.. % -target -checked))})
                ($ :span "Group by \"bench simple\"")))
 
-         ;; REGRESSION
+         ;; Regression
          ($ :div {:class "panel-row"}
             ($ :div {:class "field"}
                ($ :label {:class "field-label"} "Regression, %")
                ($ :div {:class "field-inputs"}
                   ($ :input {:type "number"
                              :class "input"
-                             :value (:regression state)
+                             :value (:regression options)
                              :on-change #(update! :regression
                                                   (js/parseFloat (.. % -target -value)))}))))
 
-         ;; coeff of variation
+         ;; Coeff of variation
          ($ :div {:class "panel-row"}
             ($ :div {:class "field"}
                ($ :label {:class "field-label"} "Coefficient of variation, %")
                ($ :div {:class "field-inputs"}
                   ($ :input {:type "number"
                              :class "input"
-                             :value (:coeff-variation state)
+                             :value (:coeff-variation options)
                              :on-change #(update! :coeff-variation
                                                   (js/parseFloat (.. % -target -value)))}))))
 
-         ;; ignore missing
+         ;; Ignore missing
          ($ :div {:class "panel-row"}
             ($ :label {:class "field"}
                ($ :input {:type "checkbox"
-                          :checked (:ignore-missing? state)
+                          :checked (:ignore-missing? options)
                           :on-change #(update! :ignore-missing?
                                                (.. % -target -checked))})
                ($ :span "Ignore missing benchmark")))
 
-         ;; apply button
+         ;; Apply button
          ($ :div {:class "panel-footer"}
             ($ :button {:class "apply-btn"
-                        :on-click #(js/console.log "APPLY" (clj->js state))}
+                        :on-click #(on-apply options)}
                "Apply"))))))

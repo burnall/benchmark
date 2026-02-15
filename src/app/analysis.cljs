@@ -24,11 +24,35 @@
 (defn- regression-passed? [old-v new-v regression]
   (>= regression (/ (- new-v old-v) old-v)))
 
-(defn pass? [{:keys [old new]} {:keys [regression coeff-variation ignore-missing-new]}]
+(defn- pass? [{:keys [old new]} {:keys [regression coeff-variation ignore-missing-new]}]
   (if new
     (and (<= (:cv new) coeff-variation)
          (regression-passed? (:mean old) (:mean new) regression))
     ignore-missing-new))
+
+
+(defn filter-by-options [joined-agg options]
+  ;; (prn (js->clj options))
+  (reduce-kv (fn [m k v]
+               (if (pass? v options)
+                 m
+                 (assoc m k v)))
+             {}
+             joined-agg))
+
+;; (defn filter-by-options [joined-agg options]
+;;   (let [x (filter-by-options2 joined-agg options)
+;;         y (js/console.log (clj->js x))] x))
+;; (defn filter-by-options [joined-agg options]
+;;   joined-agg)
+
+(defn- filter-by-benchmark [sample short? benchmark]
+  (let [key (if short? :bench_simple :bench_full)]
+    (filter #(= benchmark (key %)) sample)))
+
+(defn filter-samples-by-benchmark [sample-old sample-new short? benchmark]
+  {:old (filter-by-benchmark sample-old short? benchmark)
+   :new (filter-by-benchmark sample-new short? benchmark)})
 
 (comment
   (aggregate [{:a "a" :ms 1}, {:a "a" :ms 3}, {:a "b" :ms 10}] :a)
@@ -39,4 +63,8 @@
   (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.05, :ignore-missing-new true})
   (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.1, :ignore-missing-new true})
   (pass? {:old {:mean 2}} {:ignore-missing-new true})
-  (pass? {:old {:mean 2}} {:ignore-missing-new false}))
+  (pass? {:old {:mean 2}} {:ignore-missing-new false})
+  (filter-by-benchmark [{:bench_full "abc", :v 123} {:bench_full "de", :v 77}] false "de")
+  (filter-by-options {"ab" {:old {:mean 2.0}, :new {:mean 2.5, :cv 0.1}}
+                      "fg" {:old {:mean 2.0}, :new {:mean 2.0, :cv 0.1}}}
+                     {:regresssion 0, :coeff-variation 0.1}))
