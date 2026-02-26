@@ -40,6 +40,7 @@
 
 (defui app []
   (let [[options set-options!] (uix.core/use-state cockpit-default-options)
+        aa (js/console.log "Options" (clj->js options))
         benchmarks (get-benchmarks options)
         failed-count (count benchmarks)
         total-count (get-benchmark-count options)

@@ -24,15 +24,14 @@
 (defn- regression-passed? [old-v new-v regression]
   (>= regression (/ (- new-v old-v) old-v)))
 
-(defn- pass? [{:keys [old new]} {:keys [regression coeff-variation ignore-missing-new]}]
+(defn- pass? [{:keys [old new]} {:keys [regression coeff-variation ignore-missing?]}]
   (if new
     (and (<= (:cv new) coeff-variation)
          (regression-passed? (:mean old) (:mean new) regression))
-    ignore-missing-new))
-
+    ignore-missing?))
 
 (defn filter-by-options [joined-agg options]
-  ;; (prn (js->clj options))
+  (js/console.log (clj->js options))
   (reduce-kv (fn [m k v]
                (if (pass? v options)
                  m
@@ -56,9 +55,10 @@
   (pass? {:old {:mean 2}, :new {:mean 2.5}} {:regression 0.2, :coeff-variation 1, :ignore-missing-new true})
   (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.05, :ignore-missing-new true})
   (pass? {:old {:mean 2}, :new {:mean 2.5, :cv 0.1}} {:regression 1, :coeff-variation 0.1, :ignore-missing-new true})
-  (pass? {:old {:mean 2}} {:ignore-missing-new true})
-  (pass? {:old {:mean 2}} {:ignore-missing-new false})
+  (pass? {:old {:mean 2}} {:ignore-missing? true})
+  (pass? {:old {:mean 2}} {:ignore-missing? false})
   (filter-by-benchmark [{:bench_full "abc", :v 123} {:bench_full "de", :v 77}] false "de")
   (filter-by-options {"ab" {:old {:mean 2.0}, :new {:mean 2.5, :cv 0.1}}
+                      "cd" {:old {:mean 2.0}}
                       "fg" {:old {:mean 2.0}, :new {:mean 2.0, :cv 0.1}}}
-                     {:regresssion 0, :coeff-variation 0.1}))
+                     {:regresssion 0, :coeff-variation 0.1, :ignore-missing? true}))
