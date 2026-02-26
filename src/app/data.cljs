@@ -1,7 +1,7 @@
 (ns app.data)
 
 (def old
-  [{:bench_simple "IndexScan.executePlan", :bench_full "IndexScan.executePlan_(propertyType,long)_(runtime,interpreted)", :ms 241.086476921135, :timestamp 1576452190236}
+  [{:bench_simple "IndexScan.executePlan2", :bench_full "IndexScan.executePlan_(propertyType,long)_(runtime,interpreted)", :ms 241.086476921135, :timestamp 1576452190236}
    {:bench_simple "IndexScan.executePlan", :bench_full "IndexScan.executePlan_(propertyType,long)_(runtime,interpreted)", :ms 251.631595855737, :timestamp 1576214538490}
    {:bench_simple "IndexScan.executePlan", :bench_full "IndexScan.executePlan_(propertyType,long)_(runtime,interpreted)", :ms 247.688872464516, :timestamp 1575788177503}
    {:bench_simple "IndexScan.executePlan", :bench_full "IndexScan.executePlan_(propertyType,long)_(runtime,interpreted)", :ms 202.457436595744, :timestamp 1575228520664}

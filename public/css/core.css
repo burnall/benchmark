@@ -101,13 +101,12 @@ body {
 /* Grid */
 .simple-grid {
     display: grid;
-    gap: 4px;
+    gap: 0;
 }
 
 .grid-row {
     display: contents;
     grid-auto-flow: column;
-    gap: 4px;
     cursor: pointer;
 }
 
@@ -137,6 +136,10 @@ body {
 .grid-cell {
     padding: 2px 6px;
     min-width: 0;
+}
+
+.grid-row.selected > .grid-cell {
+    background-color: lightgray;
 }
 
 /*Input with no spinner*/
